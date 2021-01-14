@@ -5,6 +5,7 @@ import feathersClient from '../feathers-client';
 
 const {
   auth,
+  service,
   FeathersVuex,
 } = feathersVuex(feathersClient, { idField: '_id' });
 
@@ -15,6 +16,14 @@ export default new Vuex.Store({
 
   plugins: [
     // Setup the auth plugin.
+    service('users', {
+      instanceDefaults: {
+        username: '',
+        password: '',
+        displayName: '',
+        imageUrl: '',
+      },
+    }),
     auth({
       userService: 'users',
     }),

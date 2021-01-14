@@ -1,27 +1,22 @@
 <template>
   <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-    > App
-    </v-app-bar>
+    <v-toolbar
+      toolbar
+      max-height="50px"
+    >Temp</v-toolbar>
     <v-main>
-      <HelloWorld/>
+      <router-view></router-view>
     </v-main>
+    <v-footer app>
+      <span>&copy; 2018 - Made with 💙 by Justin</span>
+    </v-footer>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue';
 
 export default {
   name: 'App',
-
-  components: {
-    HelloWorld,
-  },
-
   data: () => ({
     //
   }),
