@@ -6,12 +6,14 @@
           v-if="!loading"
         >
           <v-text-field
+            dense
             v-model="user.username"
             :rules="notEmptyRules"
             label="Username"
             required
           ></v-text-field>
           <v-text-field
+            dense
             v-model="user.password"
             :rule="notEmptyRules"
             label="Password"
@@ -54,6 +56,16 @@ export default {
     ...mapActions('auth', ['reAuthenticate']),
     login() {
       if (this.valid) {
+        this.$store.dispatch('auth/authenticate', {
+          strategy: 'local',
+          username: this.user.username,
+          password: this.user.password,
+        }).then(() => {
+          this.$router.push('/boards');
+        }).catch((error) => {
+          console.log('Authentication error', error);
+        });
+        /*
         this.authenticate({
           strategy: 'local',
           username: this.user.username,
@@ -63,6 +75,7 @@ export default {
           console.log(response);
           console.log('logged in!!');
         });
+        */
       }
     },
   },

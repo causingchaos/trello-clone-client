@@ -55,7 +55,7 @@ import { mapState } from 'vuex';
 
 export default {
   name: 'signUp',
-  data: (vm) => ({ // add vm here passing in to get access to all data on model
+  data: (vm) => ({ // add vm (view-model) here passing in to get access to all data on model
     valid: false,
     user: {
       username: '',
@@ -74,15 +74,26 @@ export default {
   methods: {
     signUp() {
       if (this.valid) {
-        console.log('attempting submit');
+        // 2.x way
+        // new this.$FeathersVuex.api.User({}) // Assuming default serverAlias of `api`.
+        const user = new this.$FeathersVuex.api.User(this.user);
+        delete user.confirmPassword;
+        user.save().then((createdUser) => { // note save will auto check for create, update, ect
+          console.log(createdUser);
+        }).catch((error) => {
+          console.log('error', error);
+        });
+        /*  old 1.xx way
         const { User } = this.$FeathersVuex;
         const user = new User(this.user);
+        console.log(this.user);
         delete user.confirmPassword;
         user.save().then((createdUser) => {
           // eslint-disable-next-line no-console
           console.log(createdUser);
           this.$router.push('/login');
         }); // don't need to use .create
+        */
       }
     },
   },

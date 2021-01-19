@@ -1,9 +1,8 @@
 <template>
-  <v-container fluid>
+  <v-container>
     <v-slide-y-transition mode="out-in">
       <v-layout column align-center>
-        <v-btn :to="{ name: 'signup' }">Go to Signup</v-btn>
-        <v-btn :to="{ name: 'login' }">Go to Login</v-btn>
+        <h1>Loading....</h1>
       </v-layout>
     </v-slide-y-transition>
   </v-container>
