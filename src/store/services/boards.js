@@ -4,14 +4,14 @@ import feathersClient, {
   BaseModel,
 } from '../../feathers-client';
 
-class Boards extends BaseModel {
+class Board extends BaseModel {
   // eslint-disable-next-line no-useless-constructor
   constructor(data, options) {
     super(data, options);
   }
 
   // Required for $FeathersVuex plugin to work after production transpile.
-  static modelName = 'Boards';
+  static modelName = 'Board';
   // Define default properties of user (match DB)
 
   static instanceDefaults() {
@@ -23,7 +23,7 @@ class Boards extends BaseModel {
 }
 const servicePath = 'boards';
 const boardsServicePlugin = makeServicePlugin({
-  Model: Boards,
+  Model: Board,
   service: feathersClient.service(servicePath),
   servicePath,
 });

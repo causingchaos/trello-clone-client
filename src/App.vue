@@ -3,7 +3,7 @@
     <v-app-bar app
       class="mr-30"
     >
-      <v-toolbar-title>Trello Clone</v-toolbar-title>
+      <v-toolbar-title>Trello</v-toolbar-title>
       <div id="navbar-search">
       <v-text-field @focus="searchOpen" @focusout="searchClose"
         prepend-inner-icon="mdi-magnify"
@@ -27,11 +27,10 @@
         <v-btn small class="mr-0" :to="{ name: 'login' }">Login</v-btn>
       </div>
       <div v-if="user">
-        <v-btn @click="logout" small class="mr-0" :to="{ name: 'login' }">Logout</v-btn>
+        <v-btn @click="logout" small class="mr-0">Logout</v-btn>
       </div>
     </v-app-bar>
     <v-main>
-
       <router-view></router-view>
     </v-main>
     <v-footer app>
@@ -86,7 +85,10 @@ export default {
       document.querySelector('#results-menu').classList.toggle('hidden');
     },
     logout() {
-      this.$store.dispatch('auth/logout').then(() => this.$router.push('/login'));
+      this.$store.dispatch('auth/logout')
+        .then(() => {
+          this.$router.go({ name: 'login' });
+        });
     },
   },
   computed: {

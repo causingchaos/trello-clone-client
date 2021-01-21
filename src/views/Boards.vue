@@ -7,7 +7,7 @@
       indeterminate
       ></v-progress-circular>
     <div class="d-flex mb-4 justify-space-around flex-wrap" v-if="!loading">
-      <v-card width="300" class="ma-2" v-for="board in boards" :key="board">
+      <v-card width="300" class="ma-2" v-for="board in boards" :key="board.id">
         <v-img height="200px" :src="board.background"></v-img>
         <v-card-title>{{board.name}}</v-card-title>
         <v-card-actions>
@@ -64,17 +64,21 @@ export default {
     notEmptyRules: [(value) => !!value || 'Cannot be empty'],
   }),
   mounted() {
-    this.findBoards({ query: {} })
-      .then((response) => {
-        const boards = response.data || response;
-        console.log(boards);
-      });
+    this.findBoards({ query: {} });
+    // UNSAFE, can access data of other users ??? ERROR
+    this.getUser(1).then((result) => {
+      console.log('DEBUG Security issue (boards.vue) -- can access other users data if logged in');
+      console.log('displaying user with id 1');
+      console.log(result);
+    });
   },
   methods: {
+    ...mapActions('auth', ['authenticate']),
     ...mapActions('boards', { findBoards: 'find' }),
+    ...mapActions('users', { getUser: 'get' }),
     createBoard() {
       if (this.valid) {
-        const board = new this.$FeathersVuex.api.Boards(this.board);
+        const board = new this.$FeathersVuex.api.Board(this.board);
         board.save();
         this.board.name = '';
         this.board.background = '';
@@ -82,13 +86,18 @@ export default {
     },
   },
   computed: {
+    ...mapState('auth', { loggedInUser: 'payload' }),
     ...mapState('boards', {
       loading: 'isFindPending',
       creating: 'isCreatePending',
     }),
     ...mapGetters('boards', { findBoardsInStore: 'find' }),
     boards() {
-      return this.findBoardsInStore({ query: {} }).data;
+      return this.findBoardsInStore({
+        query: {
+          ownerId: this.loggedInUser.id,
+        },
+      }).data;
     },
   },
 };

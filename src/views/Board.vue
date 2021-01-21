@@ -1,14 +1,16 @@
 <template>
   <v-container mt-3>
     <v-progress-circular
-      v-if='loading'
+      v-if='loadingBoard || loadingLists'
       :width="7" :size="50"
       color="primary"
       indeterminate
       ></v-progress-circular>
-   <h2 v-if="board">{{board.name}}</h2>
-    <div class="d-flex mb-4 justify-space-around flex-wrap" v-if="!loading">
-      <v-card width="300" class="ma-2" v-for="list in lists" :key="list">
+    <div class="d-flex">
+      <h2 v-if="board">{{board.name}}</h2>
+    </div>
+    <div class="d-flex mb-4 justify-space-around flex-wrap" v-if="!loadingLists">
+      <v-card width="300" class="ma-2" v-for="list in lists" :key="list._id">
         <v-card-title>{{list.name}}</v-card-title>
       </v-card>
     </div>
@@ -42,7 +44,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex';
+import { mapActions, mapState, mapGetters } from 'vuex';
 
 export default {
   name: 'board',
@@ -51,37 +53,56 @@ export default {
     board: {},
     list: {
       name: '',
+      order: 0,
+      archived: false,
     },
     notEmptyRules: [(value) => !!value || 'Cannot be empty'],
   }),
   mounted() {
-    console.log(this.$route.params.id);
     this.getBoard(this.$route.params.id) // id of the current page were on, i.e. boards/2
       .then((response) => {
         this.board = response.data || response;
       });
+    this.list.boardId = this.$route.params.id;
+    this.findLists({
+      query: {
+        boardId: this.$route.params.id,
+      },
+    }).then((response) => {
+      console.log('calling findLists query', response);
+    });
   },
   methods: {
     ...mapActions('boards', { getBoard: 'get' }),
+    ...mapActions('lists', { findLists: 'find' }),
     createList() {
-      if (this.valid) {
-        const list = new this.$FeathersVuex.api.Boards(this.list);
+      if (this.validList) {
+        const list = new this.$FeathersVuex.api.List(this.list);
+        list.boardId = this.$route.params.id;
         list.save();
-        this.list.name = '';
+        this.list = { // overwrite fields
+          name: '',
+          order: 0,
+          archived: false,
+        };
       }
     },
   },
   computed: {
     ...mapState('boards', {
-      loading: 'isGetPending',
+      loadingBoard: 'isGetPending',
     }),
-    /*
-    ...mapGetters('boards', { getBoardInStore: 'get' }),
-    board() {
+    ...mapState('lists', {
+      creatingList: 'isCreatePending',
+      loadingLists: 'isFindPending',
+    }),
+    ...mapGetters('lists', { findListsInStore: 'find' }),
+    lists() {
       // return this.getBoardInStore({ query: {} }).data;
-      return this.getBoardInStore(this.$route.params.id).data;
+      return this.findListsInStore({
+        boardId: this.$route.params.id,
+      }).data;
     },
-    */
   },
 };
 </script>

@@ -7,6 +7,7 @@ import auth from './store.auth';
 // Need to manually import each of the modules and list in plugin array
 import userServicePlugin from './services/users';
 import boardServicePlugin from './services/boards';
+import listServicePlugin from './services/lists';
 
 /*
 const {
@@ -20,7 +21,12 @@ Vue.use(Vuex);
 Vue.use(FeathersVuex);
 
 export default new Vuex.Store({
-  plugins: [userServicePlugin, boardServicePlugin, auth],
+  plugins: [
+    userServicePlugin,
+    boardServicePlugin,
+    listServicePlugin,
+    auth,
+  ],
   state: {},
   actions: {},
   mutations: {},
