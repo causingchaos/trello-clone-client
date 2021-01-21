@@ -3,7 +3,7 @@
     <v-app-bar app
       class="mr-30"
     >
-      <v-toolbar-title>BackpackersDB</v-toolbar-title>
+      <v-toolbar-title>Trello Clone</v-toolbar-title>
       <div id="navbar-search">
       <v-text-field @focus="searchOpen" @focusout="searchClose"
         prepend-inner-icon="mdi-magnify"
@@ -21,10 +21,14 @@
         </ul>
         </div>
       </div>
-      <div>Hello</div>
       <v-spacer></v-spacer>
-      <v-btn small class="mr-1" :to="{ name: 'signup' }">Signup</v-btn>
-      <v-btn small class="mr-0" :to="{ name: 'login' }">Login</v-btn>
+      <div v-if="!user">
+        <v-btn small class="mr-1" :to="{ name: 'signup' }">Signup</v-btn>
+        <v-btn small class="mr-0" :to="{ name: 'login' }">Login</v-btn>
+      </div>
+      <div v-if="user">
+        <v-btn @click="logout" small class="mr-0" :to="{ name: 'login' }">Logout</v-btn>
+      </div>
     </v-app-bar>
     <v-main>
 
@@ -56,7 +60,7 @@
 }
 </style>
 <script>
-// import { mapActions } from 'vuex';
+import { mapState } from 'vuex';
 
 export default {
   name: 'App',
@@ -67,9 +71,9 @@ export default {
   },
   mounted() {
     this.$store.dispatch('auth/authenticate').then(() => {
-      this.$router.push('/boards');
+      console.log('user is authenticated');
     }).catch(() => {
-      this.$router.push('/login');
+      console.log('user is not authenticated');
     });
   },
   methods: {
@@ -81,6 +85,12 @@ export default {
       console.log('Un focused');
       document.querySelector('#results-menu').classList.toggle('hidden');
     },
+    logout() {
+      this.$store.dispatch('auth/logout').then(() => this.$router.push('/login'));
+    },
+  },
+  computed: {
+    ...mapState('auth', { user: 'payload' }),
   },
 };
 </script>

@@ -6,6 +6,7 @@ import { FeathersVuex } from '../feathers-client';
 import auth from './store.auth';
 // Need to manually import each of the modules and list in plugin array
 import userServicePlugin from './services/users';
+import boardServicePlugin from './services/boards';
 
 /*
 const {
@@ -19,7 +20,7 @@ Vue.use(Vuex);
 Vue.use(FeathersVuex);
 
 export default new Vuex.Store({
-  plugins: [userServicePlugin, auth],
+  plugins: [userServicePlugin, boardServicePlugin, auth],
   state: {},
   actions: {},
   mutations: {},

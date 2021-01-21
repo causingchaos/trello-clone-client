@@ -13,11 +13,9 @@
             required
           ></v-text-field>
           <v-text-field
-            dense
             v-model="user.password"
-            :rule="notEmptyRules"
+            :rules="notEmptyRules"
             label="Password"
-            type="password"
             required
           ></v-text-field>
           <v-btn type="submit" :disabled="!valid" color="primary">Login</v-btn>
@@ -61,6 +59,7 @@ export default {
           username: this.user.username,
           password: this.user.password,
         }).then(() => {
+          console.log('pushing user to boards');
           this.$router.push('/boards');
         }).catch((error) => {
           console.log('Authentication error', error);
