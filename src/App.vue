@@ -27,10 +27,15 @@
         <v-btn small class="mr-0" :to="{ name: 'login' }">Login</v-btn>
       </div>
       <div v-if="user">
-        <v-btn @click="logout" small class="mr-0">Logout</v-btn>
+        <v-btn @click="logout" small class="mr-2">Logout</v-btn>
+        <v-avatar color="primary" size="40" class="mr-0">
+          <img :src="user.user.imageUrl" alt="avatar">
+        </v-avatar>
       </div>
     </v-app-bar>
     <v-main>
+      <pre v-if="user">Welcome {{user.user.displayName}}</pre>
+      <pre v-if="user">Welcome {{user.user.id}}</pre>
       <router-view></router-view>
     </v-main>
     <v-footer app>

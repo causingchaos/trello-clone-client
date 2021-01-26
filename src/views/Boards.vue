@@ -7,7 +7,7 @@
       indeterminate
       ></v-progress-circular>
     <div class="d-flex mb-4 justify-space-around flex-wrap" v-if="!loading">
-      <v-card width="300" class="ma-2" v-for="board in boards" :key="board.id">
+      <v-card width="300" class="ma-2" v-for="board in boards" :key="board._id">
         <v-img height="200px" :src="board.background"></v-img>
         <v-card-title>{{board.name}}</v-card-title>
         <v-card-actions>
@@ -67,7 +67,7 @@ export default {
     this.findBoards({ query: {} });
     // UNSAFE, can access data of other users ??? ERROR
     this.getUser(1).then((result) => {
-      console.log('DEBUG Security issue (boards.vue) -- can access other users data if logged in');
+      console.log('DEBUG Security issue (boards.vue) -- can currently access other users data if logged in');
       console.log('displaying user with id 1');
       console.log(result);
     });
@@ -86,7 +86,7 @@ export default {
     },
   },
   computed: {
-    ...mapState('auth', { loggedInUser: 'payload' }),
+    ...mapState('auth', { user: 'payload' }),
     ...mapState('boards', {
       loading: 'isFindPending',
       creating: 'isCreatePending',
@@ -95,7 +95,7 @@ export default {
     boards() {
       return this.findBoardsInStore({
         query: {
-          ownerId: this.loggedInUser.id,
+          ownerId: this.user.user.id,
         },
       }).data;
     },
