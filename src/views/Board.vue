@@ -1,5 +1,5 @@
 <template>
-  <v-container mt-3>
+  <v-container mt-0>
     <v-progress-circular
       v-if='loadingBoard || loadingLists'
       :width="7" :size="50"
@@ -8,10 +8,17 @@
       ></v-progress-circular>
     <div class="d-flex">
       <h2 v-if="board">{{board.name}}</h2>
+      <pre>{{cards}}</pre>
     </div>
-    <div class="d-flex mb-4 justify-space-around flex-wrap" v-if="!loadingLists">
-      <v-card width="300" class="ma-2" v-for="list in lists" :key="list._id">
+    <div class="d-flex mb-4 flex-wrap" v-if="!loadingLists">
+      <v-card class="ma-2" v-for="list in lists" :key="list.id">
         <v-card-title>{{list.name}}</v-card-title>
+        <v-card-actions>
+          <create-card
+            :listId="list.id"
+            :boardId="$route.params.id"
+          ></create-card>
+        </v-card-actions>
       </v-card>
     </div>
     <div class="d-flex">
@@ -45,8 +52,10 @@
 
 <script>
 import { mapActions, mapState, mapGetters } from 'vuex';
+import CreateCard from './CreateCard.vue';
 
 export default {
+  components: { CreateCard },
   name: 'board',
   data: () => ({
     validList: false,
@@ -71,10 +80,18 @@ export default {
     }).then((response) => {
       console.log('calling findLists query', response);
     });
+    this.findCards({
+      query: {
+        boardId: this.$route.params.id,
+      },
+    }).then((response) => {
+      console.log('calling findCards query', response);
+    });
   },
   methods: {
     ...mapActions('boards', { getBoard: 'get' }),
     ...mapActions('lists', { findLists: 'find' }),
+    ...mapActions('cards', { findCards: 'find' }),
     createList() {
       if (this.validList) {
         const list = new this.$FeathersVuex.api.List(this.list);
@@ -97,9 +114,16 @@ export default {
       loadingLists: 'isFindPending',
     }),
     ...mapGetters('lists', { findListsInStore: 'find' }),
+    ...mapGetters('cards', { findCardsInStore: 'find' }),
     lists() {
       // return this.getBoardInStore({ query: {} }).data;
       return this.findListsInStore({
+        boardId: this.$route.params.id,
+      }).data;
+    },
+    cards() {
+      // return this.getBoardInStore({ query: {} }).data;
+      return this.findCardsInStore({
         boardId: this.$route.params.id,
       }).data;
     },

@@ -1,5 +1,5 @@
 <template>
-  <v-container mt-3>
+  <v-container>
     <v-progress-circular
       v-if='loading'
       :width="7" :size="50"

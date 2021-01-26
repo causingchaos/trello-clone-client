@@ -8,6 +8,7 @@ import auth from './store.auth';
 import userServicePlugin from './services/users';
 import boardServicePlugin from './services/boards';
 import listServicePlugin from './services/lists';
+import cardServicePlugin from './services/cards';
 
 /*
 const {
@@ -25,6 +26,7 @@ export default new Vuex.Store({
     userServicePlugin,
     boardServicePlugin,
     listServicePlugin,
+    cardServicePlugin,
     auth,
   ],
   state: {},
