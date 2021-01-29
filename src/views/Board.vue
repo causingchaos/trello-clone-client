@@ -8,11 +8,16 @@
       ></v-progress-circular>
     <div class="d-flex">
       <h2 v-if="board">{{board.name}}</h2>
-      <pre>{{cards}}</pre>
+      <!-- <pre>{{cards}}</pre> -->
     </div>
     <div class="d-flex mb-4 flex-wrap" v-if="!loadingLists">
       <v-card class="ma-2" v-for="list in lists" :key="list.id">
         <v-card-title>{{list.name}}</v-card-title>
+        <div>
+          <ul v-if="cardsByListId[list.id]">
+            <li v-bind:key="card.id" v-for="card in cardsByListId[list.id]">{{card.title}}</li>
+          </ul>
+        </div>
         <v-card-actions>
           <create-card
             :listId="list.id"
@@ -51,7 +56,10 @@
 </template>
 
 <script>
-import { mapActions, mapState, mapGetters } from 'vuex';
+import {
+  mapActions, mapState, mapGetters, mapMutations,
+} from 'vuex';
+
 import CreateCard from './CreateCard.vue';
 
 export default {
@@ -68,6 +76,7 @@ export default {
     notEmptyRules: [(value) => !!value || 'Cannot be empty'],
   }),
   mounted() {
+    this.clearLists(); // Clear the lists state on component reload/page refresh
     this.getBoard(this.$route.params.id) // id of the current page were on, i.e. boards/2
       .then((response) => {
         this.board = response.data || response;
@@ -77,18 +86,15 @@ export default {
       query: {
         boardId: this.$route.params.id,
       },
-    }).then((response) => {
-      console.log('calling findLists query', response);
     });
     this.findCards({
       query: {
         boardId: this.$route.params.id,
       },
-    }).then((response) => {
-      console.log('calling findCards query', response);
     });
   },
   methods: {
+    ...mapMutations('lists', { clearLists: 'clearAll' }),
     ...mapActions('boards', { getBoard: 'get' }),
     ...mapActions('lists', { findLists: 'find' }),
     ...mapActions('cards', { findCards: 'find' }),
@@ -126,6 +132,20 @@ export default {
       return this.findCardsInStore({
         boardId: this.$route.params.id,
       }).data;
+    },
+    cardsByListId() {
+      console.log('DEBUG --> Boards.vue - computed -> cardsBylistId');
+      console.log('cards', this.cards);
+      const result = this.cards.reduce((byId, card) => {
+        const reducer = byId; // to remove linting error
+        reducer[card.listId] = byId[card.listId] || [];
+        reducer[card.listId].push(card);
+        return reducer;
+      }, {});
+      // console.log(result);
+      console.log('result', result);
+      console.log('DEBUG END --> Boards.vue - computed -> cardsBylistId');
+      return result;
     },
   },
 };

@@ -5,6 +5,7 @@ import SignUp from '../views/SignUp.vue';
 import Login from '../views/Login.vue';
 import Boards from '../views/Boards.vue';
 import Board from '../views/Board.vue';
+import Playground from '../views/Playground.vue';
 import store from '../store/index';
 
 Vue.use(VueRouter);
@@ -28,6 +29,11 @@ const routes = [
     path: '/login',
     name: 'login',
     component: Login,
+  },
+  {
+    path: '/playground',
+    name: 'playground',
+    component: Playground,
   },
   {
     path: '/boards',

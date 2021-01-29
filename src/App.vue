@@ -34,17 +34,19 @@
       </div>
     </v-app-bar>
     <v-main>
-      <pre v-if="user">Welcome {{user.user.displayName}}</pre>
-      <pre v-if="user">Welcome {{user.user.id}}</pre>
+      <pre v-if="user">Welcome {{user.user.displayName}} your userId is: {{user.user.id}}</pre>
       <router-view></router-view>
     </v-main>
-    <v-footer app>
+    <!-- <v-footer app>
       <span>&copy; 2018 - Made with 💙 by Justin</span>
-    </v-footer>
+    </v-footer> -->
   </v-app>
 </template>
 
 <style>
+/* import base styles */
+@import './views/app.css';
+
 .hidden{
   display: none;
 }

@@ -30,13 +30,13 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
 
 export default {
   name: 'create-card',
   props: ['listId', 'boardId'],
   data: () => ({
     validCard: false,
+    creatingCard: false,
     card: {
       title: '',
       // description: '',
@@ -49,24 +49,26 @@ export default {
     notEmptyRules: [(value) => !!value || 'Cannot be empty'],
   }),
   methods: {
-    createCard() {
+    async createCard() {
       if (this.validCard) {
         this.card.listId = this.listId;
         this.card.boardId = this.boardId;
         const card = new this.$FeathersVuex.api.Card(this.card);
-        card.save();
+        this.creatingCard = true;
+        await card.save()
+          .then(() => console.log('card created'))
+          .catch((e) => console.log('there has been an error', e));
+        // Temp timeout to see functionality
+        setTimeout(() => {
+          this.creatingCard = false;
+        }, 200);
         this.card = { // overwrite fields
           title: '',
-          membersIds: {},
+          memberIds: {},
           order: 0,
         };
       }
     },
-  },
-  computed: {
-    ...mapState('cards', {
-      creatingCard: 'isCreatePending',
-    }),
   },
 };
 </script>

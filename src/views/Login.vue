@@ -1,24 +1,32 @@
 <template>
-  <v-container fluid>
-    <v-slide-y-transition mode="out-in">
-      <v-layout column align-center>
-        <v-form v-model="valid" @submit.prevent="login" @keydown.prevent.enter
-          v-if="!loading"
+  <v-container class="default-container" fill-height fluid >
+    <v-row align="center" justify="center">
+        <v-card class="card pa-10"
+          elevation="8"
         >
-          <v-text-field
-            dense
-            v-model="user.username"
-            :rules="notEmptyRules"
-            label="Username"
-            required
-          ></v-text-field>
-          <v-text-field
-            v-model="user.password"
-            :rules="notEmptyRules"
-            label="Password"
-            required
-          ></v-text-field>
-          <v-btn type="submit" :disabled="!valid" color="primary">Login</v-btn>
+          <v-form v-model="valid" @submit.prevent="login" @keydown.prevent.enter
+          v-if="!loading"
+          >
+            <h3>Welcome Back!</h3>
+            <v-text-field class="pt-8"
+              outlined
+              dense
+              v-model="user.username"
+              :rules="notEmptyRules"
+              label="Username"
+              required
+            ></v-text-field>
+            <v-text-field class="pt-4"
+              outlined
+              dense
+              v-model="user.password"
+              :rules="notEmptyRules"
+              label="Password"
+              required
+            ></v-text-field>
+          <v-btn width="100%" class="mt-5" type="submit" :disabled="!valid"
+            color="primary"
+          >Login</v-btn>
         </v-form>
         <v-progress-circular
           v-if="loading"
@@ -26,10 +34,22 @@
           color="primary"
           indeterminate
         ></v-progress-circular>
-      </v-layout>
-    </v-slide-y-transition>
+        </v-card>
+    </v-row>
   </v-container>
 </template>
+
+<style scoped>
+.card {
+  width: 450px;
+  height: 360px;
+}
+@media only screen and (max-width: 600px) {
+  .card{
+    width: 85%;
+  }
+}
+</style>
 
 <script>
 import { mapState, mapActions } from 'vuex';

@@ -1,43 +1,57 @@
 <template>
-  <v-container fluid>
-    <v-slide-y-transition mode="out-in">
-      <v-layout column align-center>
+  <v-container class="default-container" fill-height fluid >
+    <v-row align="center" justify="center">
+      <v-card class="card pa-10" elevation="8">
         <v-form v-model="valid" @submit.prevent="signUp" @keydown.prevent.enter
           v-if="!loading"
         >
-          <v-text-field
+          <h3>Create an account</h3>
+          <v-text-field class="pt-8"
+            outlined
+            dense
             v-model="user.username"
             :rules="notEmptyRules"
             label="Username"
             required
           ></v-text-field>
-          <v-text-field
+          <v-text-field class="pt-3"
+            outlined
+            dense
             v-model="user.displayName"
             :rules="notEmptyRules"
             label="Display Name"
             required
           ></v-text-field>
-          <v-text-field
+          <v-text-field class="pt-3"
+            outlined
+            dense
             v-model="user.password"
             :rule="notEmptyRules"
             label="Password"
             type="password"
             required
           ></v-text-field>
-          <v-text-field
+          <v-text-field class="pt-3"
+            outlined
+            dense
             v-model="user.confirmPassword"
             :rules="confirmPasswordRules"
             label="Confirm Password"
             type="password"
             required
           ></v-text-field>
-          <v-text-field
+          <v-text-field class="pt-3"
+            outlined
+            dense
             v-model="user.imageUrl"
             :rules="notEmptyRules"
             label="Image Url"
             required
           ></v-text-field>
-          <v-btn type="submit" :disabled="!valid" color="primary">SignUp</v-btn>
+          <v-btn class="mt-5" type="submit" :disabled="!valid"
+            width="100%"
+            color="primary"
+          >SignUp</v-btn>
         </v-form>
         <v-progress-circular
           v-if="loading"
@@ -45,10 +59,21 @@
           color="primary"
           indeterminate
         ></v-progress-circular>
-      </v-layout>
-    </v-slide-y-transition>
+      </v-card>
+    </v-row>
   </v-container>
 </template>
+
+<style scoped>
+.card {
+  width: 450px;
+}
+@media only screen and (max-width: 600px) {
+  .card{
+    width: 85%;
+  }
+}
+</style>
 
 <script>
 import { mapState } from 'vuex';
