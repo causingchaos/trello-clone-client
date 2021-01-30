@@ -1,54 +1,71 @@
 <template>
-  <v-container>
-    <v-progress-circular
-      v-if='loading'
-      :width="7" :size="50"
-      color="primary"
-      indeterminate
-      ></v-progress-circular>
-    <div class="d-flex mb-4 justify-space-around flex-wrap" v-if="!loading">
-      <v-card width="300" class="ma-2" v-for="board in boards" :key="board._id">
-        <v-img height="200px" :src="board.background"></v-img>
-        <v-card-title>{{board.name}}</v-card-title>
-        <v-card-actions>
-          <v-btn color="primary" :to="{ name: 'board', params: { id: board.id }}">Go</v-btn>
-        </v-card-actions>
-      </v-card>
-    </div>
-    <div class="d-flex">
-      <v-card elevation="3">
-        <v-card-title>Create Board</v-card-title>
+  <v-container fluid class="pa-2">
+    <v-row class="ml-2 mb-0">
+      <h2>Boards</h2>
+    </v-row>
+    <v-row no-gutters class="row-color">
+      <v-col v-if='loading' class="col-9">
+        <v-progress-circular
+          :width="7" :size="50"
+          color="primary"
+          indeterminate
+        ></v-progress-circular>
+      </v-col>
+      <v-col v-if="!loading" class="col-9 d-flex flex-wrap">
+        <v-card width="200" class="ma-1" v-for="board in boards" :key="board._id">
+          <v-img height="200px" :src="board.background"></v-img>
+          <v-card-title>{{board.name}}</v-card-title>
           <v-card-actions>
-            <v-card-text>
-              <v-form v-model="valid" @submit.prevent="createBoard" @keydown.prevent.enter
-                v-if="!creating"
-              >
-                <v-text-field
-                  v-model="board.name"
-                  :rules="notEmptyRules"
-                  label="Name"
-                  required
-                ></v-text-field>
-                <v-text-field
-                  v-model="board.background"
-                  :rules="notEmptyRules"
-                  label="Background"
-                  required
-                ></v-text-field>
-                <v-btn type="submit" :disabled="!valid" color="primary">Create</v-btn>
-              </v-form>
+            <v-btn color="primary" :to="{ name: 'board', params: { id: board.id }}">Go</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+      <v-col class="col-3">
+        <v-card elevation="3" class="create-col">
+          <v-card-title>Create Board</v-card-title>
+          <v-card-actions>
+            <v-form v-model="valid" @submit.prevent="createBoard" @keydown.prevent.enter
+              v-if="!creating"
+            >
+              <v-text-field class="pa-2"
+                dense
+                outlined
+                v-model="board.name"
+                :rules="notEmptyRules"
+                label="Name"
+                required
+              ></v-text-field>
+              <v-text-field class="pa-2"
+                dense
+                outlined
+                v-model="board.background"
+                :rules="notEmptyRules"
+                label="Background"
+                required
+              ></v-text-field>
+              <v-btn class="mb-2" type="submit" :disabled="!valid"
+                small
+                color="primary"
+              >Create</v-btn>
+            </v-form>
               <v-progress-circular
                 v-if='creating'
                 :width="7" :size="50"
                 color="primary"
                 indeterminate
               ></v-progress-circular>
-            </v-card-text>
           </v-card-actions>
-      </v-card>
-    </div>
+        </v-card>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
+
+<style scoped>
+.create-col{
+  min-width: 200px;
+}
+</style>
 
 <script>
 import { mapActions, mapState, mapGetters } from 'vuex';

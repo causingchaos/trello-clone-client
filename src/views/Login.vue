@@ -1,6 +1,7 @@
 <template>
-  <v-container class="default-container" fill-height fluid >
-    <v-row align="center" justify="center">
+  <v-container class="default-container pa-0">
+    <v-parallax height="800" src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1353&q=80">
+      <v-row align="center" justify="center">
         <v-card class="card pa-10"
           elevation="8"
         >
@@ -36,6 +37,7 @@
         ></v-progress-circular>
         </v-card>
     </v-row>
+    </v-parallax>
   </v-container>
 </template>
 
