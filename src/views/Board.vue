@@ -1,59 +1,78 @@
 <template>
-  <v-container mt-0>
-    <v-progress-circular
-      v-if='loadingBoard || loadingLists'
-      :width="7" :size="50"
-      color="primary"
-      indeterminate
-      ></v-progress-circular>
-    <div class="d-flex">
+  <v-container fluid class="default-container">
+    <v-row>
       <h2 v-if="board">{{board.name}}</h2>
       <!-- <pre>{{cards}}</pre> -->
-    </div>
-    <div class="d-flex mb-4 flex-wrap" v-if="!loadingLists">
-      <v-card class="ma-2" v-for="list in lists" :key="list.id">
-        <v-card-title>{{list.name}}</v-card-title>
-        <div>
-          <ul v-if="cardsByListId[list.id]">
-            <li v-bind:key="card.id" v-for="card in cardsByListId[list.id]">{{card.title}}</li>
-          </ul>
-        </div>
-        <v-card-actions>
-          <create-card
-            :listId="list.id"
-            :boardId="$route.params.id"
-          ></create-card>
-        </v-card-actions>
-      </v-card>
-    </div>
-    <div class="d-flex">
-      <v-card elevation="3">
-        <v-card-title>Create List</v-card-title>
-          <v-card-actions>
-            <v-card-text>
-              <v-form v-model="validList" @submit.prevent="createList" @keydown.prevent.enter
-                v-if="!creatingList"
+    </v-row>
+    <v-row>
+      <v-col v-if='loadingBoard || loadingLists' class="col-9">
+        <v-progress-circular
+          :width="7" :size="50"
+          color="primary"
+          indeterminate
+        ></v-progress-circular>
+      </v-col>
+      <v-col class="col-9 d-flex flex-wrap" v-if='!loadingBoard && !loadingLists'>
+        <v-card class="ma-1" width="250" v-for="list in lists" :key="list.id">
+          <v-row no-gutters class="d-flex flex-column">
+            <v-col>
+              <v-card-title>{{list.name}}</v-card-title>
+            </v-col>
+            <v-col v-if="cardsByListId[list.id]">
+              <v-card class="ma-3" draggable="true"
+                @dragstart="startDraggingCard(card)"
+                dense
+                v-bind:key="card.id" v-for="card in cardsByListId[list.id]"
               >
-                <v-text-field
-                  v-model="list.name"
-                  :rules="notEmptyRules"
-                  label="Name"
-                  required
-                ></v-text-field>
-                <v-btn type="submit" :disabled="!validList" color="primary">Create List</v-btn>
-              </v-form>
-              <v-progress-circular
-                v-if='creatingList'
-                :width="7" :size="50"
-                color="primary"
-                indeterminate
-              ></v-progress-circular>
-            </v-card-text>
+                <v-card-title>
+                  {{card.title}}
+                </v-card-title>
+              </v-card>
+            </v-col>
+          </v-row>
+          <v-card-actions>
+            <create-card
+              :listId="list.id"
+              :boardId="$route.params.id"
+            ></create-card>
           </v-card-actions>
-      </v-card>
-    </div>
+        </v-card>
+      </v-col>
+      <v-col class="col-3">
+          <v-card elevation="3" class="create-col">
+            <v-card-title>Create List</v-card-title>
+              <v-card-actions>
+                <v-card-text>
+                  <v-form v-model="validList" @submit.prevent="createList" @keydown.prevent.enter
+                    v-if="!creatingList"
+                  >
+                    <v-text-field
+                      v-model="list.name"
+                      :rules="notEmptyRules"
+                      label="Name"
+                      required
+                    ></v-text-field>
+                    <v-btn type="submit" :disabled="!validList" color="primary">Create List</v-btn>
+                  </v-form>
+                  <v-progress-circular
+                    v-if='creatingList'
+                    :width="7" :size="50"
+                    color="primary"
+                    indeterminate
+                  ></v-progress-circular>
+                </v-card-text>
+              </v-card-actions>
+          </v-card>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
+
+<style scoped>
+.create-col{
+  min-width: 200px;
+}
+</style>
 
 <script>
 import {
@@ -109,6 +128,9 @@ export default {
           archived: false,
         };
       }
+    },
+    startDraggingCard(card) {
+      console.log(card);
     },
   },
   computed: {

@@ -3,7 +3,9 @@
     <v-app-bar app
       class="mr-30"
     >
-      <v-toolbar-title>Trello</v-toolbar-title>
+      <v-toolbar-title class="ml-0">
+        <v-btn class="pa-0" :to="{ name: 'Home' }" plain>Trello</v-btn>
+      </v-toolbar-title>
       <div id="navbar-search">
       <v-text-field @focus="searchOpen" @focusout="searchClose"
         prepend-inner-icon="mdi-magnify"
@@ -28,13 +30,46 @@
       </div>
       <div v-if="user">
         <v-btn @click="logout" small class="mr-2">Logout</v-btn>
-        <v-avatar color="primary" size="40" class="mr-0">
-          <img :src="user.user.imageUrl" alt="avatar">
-        </v-avatar>
+        <v-menu
+          bottom
+          min-width="200px"
+          rounded
+          offset-y
+        >
+          <template v-slot:activator="{ on }">
+            <v-btn icon v-on="on">
+              <v-avatar color="primary" size="40" class="mr-0">
+              <img :src="user.user.imageUrl" alt="avatar">
+              </v-avatar>
+            </v-btn>
+          </template>
+          <v-card>
+            <v-list-item-content class="justify-center">
+              <div class="mx-auto text-center">
+                <v-avatar color="primary" size="40" class="mb-3">
+                  <img :src="user.user.imageUrl" alt="avatar">
+                </v-avatar>
+                <h3>{{ user.user.displayName }}</h3>
+                <p>UserID: {{ user.user.id }}</p>
+                <v-divider class="my-3"></v-divider>
+                <v-btn small>Profile</v-btn>
+                <v-divider class="my-3"></v-divider>
+                <v-btn small :to="{ name: 'boards' }">My Boards</v-btn>
+                <v-divider class="my-3"></v-divider>
+                <v-btn small>Dark Mode</v-btn>
+                <v-divider class="my-3"></v-divider>
+                <v-btn @click="logout" small>Logout</v-btn>
+              </div>
+            </v-list-item-content>
+          </v-card>
+        </v-menu>
       </div>
     </v-app-bar>
     <v-main>
-      <pre v-if="user">Welcome {{user.user.displayName}} your userId is: {{user.user.id}}</pre>
+      <!-- DEBUG <pre v-if="user">
+        Welcome {{user.user.displayName}} your userId is: {{user.user.id}}
+      </pre>
+      -->
       <router-view></router-view>
     </v-main>
     <!-- <v-footer app>

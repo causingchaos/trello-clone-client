@@ -61,7 +61,7 @@ export default {
         // Temp timeout to see functionality
         setTimeout(() => {
           this.creatingCard = false;
-        }, 200);
+        }, 300);
         this.card = { // overwrite fields
           title: '',
           memberIds: {},

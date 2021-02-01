@@ -1,9 +1,9 @@
 <template>
-  <v-container fluid class="pa-2">
-    <v-row class="ml-2 mb-0">
-      <h2>Boards</h2>
+  <v-container fluid class="default-container">
+    <v-row class="ml-0 mb-0">
+      <h2>My Boards</h2>
     </v-row>
-    <v-row no-gutters class="row-color">
+    <v-row class="pl-0">
       <v-col v-if='loading' class="col-9">
         <v-progress-circular
           :width="7" :size="50"
@@ -25,7 +25,7 @@
           <v-card-title>Create Board</v-card-title>
           <v-card-actions>
             <v-form v-model="valid" @submit.prevent="createBoard" @keydown.prevent.enter
-              v-if="!creating"
+              v-if="!creatingBoard"
             >
               <v-text-field class="pa-2"
                 dense
@@ -49,7 +49,7 @@
               >Create</v-btn>
             </v-form>
               <v-progress-circular
-                v-if='creating'
+                v-if='creatingBoard'
                 :width="7" :size="50"
                 color="primary"
                 indeterminate
@@ -73,6 +73,7 @@ import { mapActions, mapState, mapGetters } from 'vuex';
 export default {
   name: 'boards',
   data: () => ({
+    creatingBoard: false,
     valid: false,
     board: {
       name: '',
@@ -93,10 +94,14 @@ export default {
     ...mapActions('auth', ['authenticate']),
     ...mapActions('boards', { findBoards: 'find' }),
     ...mapActions('users', { getUser: 'get' }),
-    createBoard() {
+    async createBoard() {
       if (this.valid) {
         const board = new this.$FeathersVuex.api.Board(this.board);
-        board.save();
+        this.creatingBoard = true;
+        await board.save();
+        setTimeout(() => {
+          this.creatingBoard = false;
+        }, 300);
         this.board.name = '';
         this.board.background = '';
       }
@@ -106,7 +111,7 @@ export default {
     ...mapState('auth', { user: 'payload' }),
     ...mapState('boards', {
       loading: 'isFindPending',
-      creating: 'isCreatePending',
+      creating: 'isCreatePending', // not used anymore, made spinners slower instead
     }),
     ...mapGetters('boards', { findBoardsInStore: 'find' }),
     boards() {
