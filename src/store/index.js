@@ -9,6 +9,7 @@ import userServicePlugin from './services/users';
 import boardServicePlugin from './services/boards';
 import listServicePlugin from './services/lists';
 import cardServicePlugin from './services/cards';
+import activityServicePlugin from './services/activities';
 
 /*
 const {
@@ -17,7 +18,6 @@ const {
   FeathersVuex,
 } = feathersVuex(feathersClient, { idField: '_id' });
 */
-
 Vue.use(Vuex);
 Vue.use(FeathersVuex);
 
@@ -27,6 +27,7 @@ export default new Vuex.Store({
     boardServicePlugin,
     listServicePlugin,
     cardServicePlugin,
+    activityServicePlugin,
     auth,
   ],
   state: {},

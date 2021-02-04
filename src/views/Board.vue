@@ -1,6 +1,20 @@
 <template>
   <v-container fluid class="default-container">
     <v-row>
+      <v-col class="col-12">
+        <v-alert v-if="cardsError" dismissible type="error"
+        >{{cardsError.message}}
+        </v-alert>
+        <v-alert v-if="boardsError" dismissible type="error"
+        >{{boardsError.message}}
+        </v-alert>
+        <v-alert v-if="listsError" dismissible type="error"
+        >{{listsError.message}}
+        </v-alert>
+      </v-col>
+      <pre>{{activities}}</pre>
+    </v-row>
+    <v-row>
       <h2 v-if="board">{{board.name}}</h2>
       <!-- <pre>{{cards}}</pre> -->
     </v-row>
@@ -13,7 +27,11 @@
         ></v-progress-circular>
       </v-col>
       <v-col class="col-9 d-flex flex-wrap" v-if='!loadingBoard && !loadingLists'>
-        <v-card class="ma-1" width="250" v-for="list in lists" :key="list.id">
+        <v-card  class="ma-1" width="250"
+          v-for="list in lists" :key="list.id"
+          @dragover="setDroppingList($event, list)"
+          :class="{ 'green lighten-4': droppingList == list}"
+        >
           <v-row no-gutters class="d-flex flex-column">
             <v-col>
               <v-card-title>{{list.name}}</v-card-title>
@@ -21,6 +39,7 @@
             <v-col v-if="cardsByListId[list.id]">
               <v-card class="ma-3" draggable="true"
                 @dragstart="startDraggingCard(card)"
+                @dragend="dropCard()"
                 dense
                 v-bind:key="card.id" v-for="card in cardsByListId[list.id]"
               >
@@ -85,6 +104,8 @@ export default {
   components: { CreateCard },
   name: 'board',
   data: () => ({
+    droppingList: null,
+    draggingCard: null,
     validList: false,
     board: {},
     list: {
@@ -111,38 +132,83 @@ export default {
         boardId: this.$route.params.id,
       },
     });
+    this.findActivities({
+      query: {
+        boardId: this.$route.params.id,
+      },
+    });
   },
   methods: {
     ...mapMutations('lists', { clearLists: 'clearAll' }),
     ...mapActions('boards', { getBoard: 'get' }),
     ...mapActions('lists', { findLists: 'find' }),
     ...mapActions('cards', { findCards: 'find' }),
-    createList() {
+    ...mapActions('activities', { findActivities: 'find' }),
+    async createList() {
       if (this.validList) {
         const list = new this.$FeathersVuex.api.List(this.list);
         list.boardId = this.$route.params.id;
-        list.save();
+        await list.save();
         this.list = { // overwrite fields
           name: '',
           order: 0,
           archived: false,
         };
+        //
+        const activity = new this.$FeathersVuex.api.Activity();
+        console.log('DEBUG: activity: ', activity);
+        activity.text = `${this.user.user} created list ${list.name}`;
+        activity.boardId = this.$route.params.id;
+        activity.save();
       }
     },
     startDraggingCard(card) {
-      console.log(card);
+      // console.log('starting dragging...', card);
+      this.draggingCard = card;
+    },
+    setDroppingList(event, list) {
+      // console.log(event);
+      // Note you can pass in the raw event dom object in vue by using $event
+      this.droppingList = list;
+      event.preventDefault();
+    },
+    dropCard() {
+      console.log('dropping card');
+      console.log(this.droppingList);
+      if (this.droppingList) {
+        console.log(this.draggingCard.listId);
+        console.log(this.droppingList.id);
+        this.draggingCard.listId = this.droppingList.id;
+        this.draggingCard.save(); // update card in backend
+      }
+      this.droppingList = null;
+      this.draggingCard = null;
     },
   },
   computed: {
     ...mapState('boards', {
       loadingBoard: 'isGetPending',
+      boardsError: 'errorOnGet',
+
     }),
+    ...mapState('auth', { user: 'payload' }),
     ...mapState('lists', {
       creatingList: 'isCreatePending',
       loadingLists: 'isFindPending',
+      listsError: 'errorOnFind',
+    }),
+    ...mapState('cards', {
+      cardsError: 'errorOnFind',
     }),
     ...mapGetters('lists', { findListsInStore: 'find' }),
     ...mapGetters('cards', { findCardsInStore: 'find' }),
+    ...mapGetters('activities', { findActivitiesInStore: 'find' }),
+    activities() {
+      // return this.getBoardInStore({ query: {} }).data;
+      return this.findActivitiesInStore({
+        boardId: this.$route.params.id,
+      }).data;
+    },
     lists() {
       // return this.getBoardInStore({ query: {} }).data;
       return this.findListsInStore({
@@ -156,8 +222,8 @@ export default {
       }).data;
     },
     cardsByListId() {
-      console.log('DEBUG --> Boards.vue - computed -> cardsBylistId');
-      console.log('cards', this.cards);
+      // console.log('DEBUG --> Boards.vue - computed -> cardsBylistId');
+      // console.log('cards', this.cards);
       const result = this.cards.reduce((byId, card) => {
         const reducer = byId; // to remove linting error
         reducer[card.listId] = byId[card.listId] || [];
@@ -165,8 +231,8 @@ export default {
         return reducer;
       }, {});
       // console.log(result);
-      console.log('result', result);
-      console.log('DEBUG END --> Boards.vue - computed -> cardsBylistId');
+      // console.log('result', result);
+      // console.log('DEBUG END --> Boards.vue - computed -> cardsBylistId');
       return result;
     },
   },
