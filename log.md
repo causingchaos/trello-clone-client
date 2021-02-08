@@ -11,3 +11,5 @@ Create a new service
 feathers g service
 
 make sure to remove the models DB table creation logic and create a new knex migration
+
+## Extra stuff, markdown package ###

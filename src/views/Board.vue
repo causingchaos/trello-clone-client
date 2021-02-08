@@ -1,6 +1,7 @@
 <template>
   <v-container fluid class="default-container">
-    <v-row>
+    <v-row class="bg-green">
+      <h2 v-if="board">{{board.name}}</h2>
       <v-col class="col-12">
         <v-alert v-if="cardsError" dismissible type="error"
         >{{cardsError.message}}
@@ -12,21 +13,20 @@
         >{{listsError.message}}
         </v-alert>
       </v-col>
-      <pre>{{activities}}</pre>
+      <!-- <pre>{{activities}}</pre> -->
     </v-row>
     <v-row>
-      <h2 v-if="board">{{board.name}}</h2>
       <!-- <pre>{{cards}}</pre> -->
     </v-row>
     <v-row>
-      <v-col v-if='loadingBoard || loadingLists' class="col-9">
+      <v-col v-if='loadingBoard || loadingLists' class="col-8">
         <v-progress-circular
           :width="7" :size="50"
           color="primary"
           indeterminate
         ></v-progress-circular>
       </v-col>
-      <v-col class="col-9 d-flex flex-wrap" v-if='!loadingBoard && !loadingLists'>
+      <v-col class="col-8 d-flex flex-wrap bg-yellow" v-if='!loadingBoard && !loadingLists'>
         <v-card  class="ma-1" width="250"
           v-for="list in lists" :key="list.id"
           @dragover="setDroppingList($event, list)"
@@ -57,8 +57,9 @@
           </v-card-actions>
         </v-card>
       </v-col>
-      <v-col class="col-3">
-          <v-card elevation="3" class="create-col">
+      <v-col class="col-4 bg-blue">
+        <v-row>
+          <v-card elevation="3" class="ma-2 create-col">
             <v-card-title>Create List</v-card-title>
               <v-card-actions>
                 <v-card-text>
@@ -82,6 +83,17 @@
                 </v-card-text>
               </v-card-actions>
           </v-card>
+          <v-card elevation="3" class="ma-2 activity-row">
+            <v-list-item>
+              <v-list-item-content>
+                <v-list-item-title>Activity Log</v-list-item-title>
+                <v-list-item-subtitle
+                  v-for="activity in activities" :key="activity.id"
+                >{{activity.text}}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </v-card>
+        </v-row>
       </v-col>
     </v-row>
   </v-container>
@@ -90,6 +102,18 @@
 <style scoped>
 .create-col{
   min-width: 200px;
+}
+.activity-row{
+  min-width: 320px;
+}
+.bg-blue{
+  background-color: lightblue;
+}
+.bg-yellow{
+  background-color: lightyellow;
+}
+.bg-green{
+  background-color: lightgreen;
 }
 </style>
 
@@ -157,7 +181,7 @@ export default {
         //
         const activity = new this.$FeathersVuex.api.Activity();
         console.log('DEBUG: activity: ', activity);
-        activity.text = `${this.user.user} created list ${list.name}`;
+        activity.text = `*${this.user.user.username}* created list _${list.name}_`;
         activity.boardId = this.$route.params.id;
         activity.save();
       }
