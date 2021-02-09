@@ -16,9 +16,6 @@
       <!-- <pre>{{activities}}</pre> -->
     </v-row>
     <v-row>
-      <!-- <pre>{{cards}}</pre> -->
-    </v-row>
-    <v-row>
       <v-col v-if='loadingBoard || loadingLists' class="col-8">
         <v-progress-circular
           :width="7" :size="50"
@@ -58,7 +55,7 @@
         </v-card>
       </v-col>
       <v-col class="col-4 bg-blue">
-        <v-row>
+        <v-row class="mr-1">
           <v-card elevation="3" class="ma-2 create-col">
             <v-card-title>Create List</v-card-title>
               <v-card-actions>
@@ -83,15 +80,29 @@
                 </v-card-text>
               </v-card-actions>
           </v-card>
-          <v-card elevation="3" class="ma-2 activity-row">
-            <v-list-item>
-              <v-list-item-content>
-                <v-list-item-title>Activity Log</v-list-item-title>
+          <v-card height="100vh" title elevation="3" class="ml-2 activity-row">
+            <v-list three-line dense>
+              <v-subheader>ACTIVITY LOG</v-subheader>
+                <v-list-item class="pl-1" v-for="(activity,i) in activitiesByDate" :key="i">
+                  <v-list-item-icon class="mr-1">
+                    <v-icon color="green">mdi-account-circle</v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title v-html="user.user.displayName"></v-list-item-title>
+                    <v-list-item-subtitle
+                      v-html="markdownify(activity.text)"
+                    ></v-list-item-subtitle>
+                  </v-list-item-content>
+                </v-list-item>
+            </v-list>
+                <!--
                 <v-list-item-subtitle
                   v-for="activity in activities" :key="activity.id"
                 >{{activity.text}}</v-list-item-subtitle>
-              </v-list-item-content>
-            </v-list-item>
+                <v-list-item-action>
+                  <v-icon color="green">mdi-account-circle</v-icon>
+                </v-list-item-action>
+                -->
           </v-card>
         </v-row>
       </v-col>
@@ -104,7 +115,7 @@
   min-width: 200px;
 }
 .activity-row{
-  min-width: 320px;
+  min-width: 100%;
 }
 .bg-blue{
   background-color: lightblue;
@@ -118,6 +129,7 @@
 </style>
 
 <script>
+import marked from 'marked';
 import {
   mapActions, mapState, mapGetters, mapMutations,
 } from 'vuex';
@@ -178,13 +190,15 @@ export default {
           order: 0,
           archived: false,
         };
-        //
-        const activity = new this.$FeathersVuex.api.Activity();
-        console.log('DEBUG: activity: ', activity);
-        activity.text = `*${this.user.user.username}* created list _${list.name}_`;
-        activity.boardId = this.$route.params.id;
-        activity.save();
+        this.createActivity(`**${this.user.user.username}** created list **${list.name}**`);
       }
+    },
+    createActivity(text) {
+      const activity = new this.$FeathersVuex.api.Activity();
+      // console.log('DEBUG: activity: ', activity);
+      activity.text = text;
+      activity.boardId = this.$route.params.id;
+      activity.save();
     },
     startDraggingCard(card) {
       // console.log('starting dragging...', card);
@@ -196,17 +210,26 @@ export default {
       this.droppingList = list;
       event.preventDefault();
     },
-    dropCard() {
-      console.log('dropping card');
-      console.log(this.droppingList);
+    async dropCard() {
       if (this.droppingList) {
-        console.log(this.draggingCard.listId);
-        console.log(this.droppingList.id);
-        this.draggingCard.listId = this.droppingList.id;
-        this.draggingCard.save(); // update card in backend
+        // do not make activity entry if they drop it on same list
+        if (this.draggingCard.listId !== this.droppingList.id) {
+          const fromList = this.lists.find((list) => list.id === this.draggingCard.listId);
+          const toList = this.lists.find((list) => list.id === this.droppingList.id);
+          this.draggingCard.listId = this.droppingList.id;
+          await this.draggingCard.save(); // update card in backend
+          this.createActivity(
+            `**${this.user.user.username}**`
+            + ` moved card **${this.draggingCard.title}**`
+            + ` from **${fromList.name}** to **${toList.name}**`,
+          );
+        }
       }
       this.droppingList = null;
       this.draggingCard = null;
+    },
+    markdownify(text) {
+      return marked(text);
     },
   },
   computed: {
@@ -258,6 +281,9 @@ export default {
       // console.log('result', result);
       // console.log('DEBUG END --> Boards.vue - computed -> cardsBylistId');
       return result;
+    },
+    activitiesByDate() {
+      return this.activities.slice().reverse();
     },
   },
 };
