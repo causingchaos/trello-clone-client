@@ -47,10 +47,14 @@
             </v-col>
           </v-row>
           <v-card-actions>
+            <!-- Custom component -->
             <create-card
+              :user="user.user"
+              :createActivity="createActivity"
               :listId="list.id"
               :boardId="$route.params.id"
             ></create-card>
+            <!-- Custom component -->
           </v-card-actions>
         </v-card>
       </v-col>
@@ -89,7 +93,7 @@
                   </v-list-item-icon>
                   <v-list-item-content>
                     <v-list-item-title v-html="user.user.displayName"></v-list-item-title>
-                    <v-list-item-subtitle
+                    <v-list-item-subtitle v-if="activitiesByDate"
                       v-html="markdownify(activity.text)"
                     ></v-list-item-subtitle>
                   </v-list-item-content>
@@ -152,6 +156,7 @@ export default {
     notEmptyRules: [(value) => !!value || 'Cannot be empty'],
   }),
   mounted() {
+    this.clearActivities(); // Clear the acitivy state on the component reload
     this.clearLists(); // Clear the lists state on component reload/page refresh
     this.getBoard(this.$route.params.id) // id of the current page were on, i.e. boards/2
       .then((response) => {
@@ -176,6 +181,7 @@ export default {
   },
   methods: {
     ...mapMutations('lists', { clearLists: 'clearAll' }),
+    ...mapMutations('activities', { clearActivities: 'clearAll' }),
     ...mapActions('boards', { getBoard: 'get' }),
     ...mapActions('lists', { findLists: 'find' }),
     ...mapActions('cards', { findCards: 'find' }),
@@ -217,7 +223,7 @@ export default {
           const fromList = this.lists.find((list) => list.id === this.draggingCard.listId);
           const toList = this.lists.find((list) => list.id === this.droppingList.id);
           this.draggingCard.listId = this.droppingList.id;
-          await this.draggingCard.save(); // update card in backend
+          await this.draggingCard.save(); // update card on feathers vuex model
           this.createActivity(
             `**${this.user.user.username}**`
             + ` moved card **${this.draggingCard.title}**`

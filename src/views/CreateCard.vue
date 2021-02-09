@@ -33,7 +33,7 @@
 
 export default {
   name: 'create-card',
-  props: ['listId', 'boardId'],
+  props: ['listId', 'boardId', 'createActivity', 'user'],
   data: () => ({
     validCard: false,
     creatingCard: false,
@@ -62,6 +62,7 @@ export default {
         setTimeout(() => {
           this.creatingCard = false;
         }, 300);
+        this.createActivity(`**${this.user.displayName}** created card **${card.title}**`);
         this.card = { // overwrite fields
           title: '',
           memberIds: {},
