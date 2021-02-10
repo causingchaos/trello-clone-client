@@ -10,10 +10,10 @@
         cols="12"
       >
         <h1 class="display-1 font-weight-thin mb-4">
-          BackpackersDB
+          Trello Clone
         </h1>
         <h4 class="subheading">
-          Share your travel experiences!
+          Trello clone
         </h4>
       </v-col>
       </v-row>

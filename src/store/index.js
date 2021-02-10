@@ -11,6 +11,8 @@ import listServicePlugin from './services/lists';
 import cardServicePlugin from './services/cards';
 import activityServicePlugin from './services/activities';
 
+import login from './login';
+
 /*
 const {
   auth,
@@ -22,6 +24,10 @@ Vue.use(Vuex);
 Vue.use(FeathersVuex);
 
 export default new Vuex.Store({
+  // Custom modules we defined, i.e. login.js
+  modules: {
+    login,
+  },
   plugins: [
     userServicePlugin,
     boardServicePlugin,

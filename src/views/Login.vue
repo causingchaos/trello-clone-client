@@ -55,6 +55,7 @@
 
 <script>
 import { mapState, mapActions } from 'vuex';
+import { notEmptyRules } from '../formValidators';
 
 export default {
   name: 'login',
@@ -65,13 +66,18 @@ export default {
       username: '',
       password: '',
     },
+    notEmptyRules,
     // additional state objects on the feathers-vuex api (https://feathers-vuex-v1.netlify.app/service-module.html#service-state)
-    notEmptyRules: [(value) => !!value || 'Cannot be empty'],
+    // notEmptyRules: [(value) => !!value || 'Cannot be empty'],
   }),
+  mounted() {
+    this.$store.dispatch('login/login');
+  },
   computed: {
     ...mapState('auth', { loading: 'isAuthenticatePending' }),
   },
   methods: {
+    ...mapActions('login', ['login']), // custom module/action
     ...mapActions('auth', ['authenticate']),
     ...mapActions('auth', ['reAuthenticate']),
     login() {
