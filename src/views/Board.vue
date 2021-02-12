@@ -13,7 +13,6 @@
         >{{listsError.message}}
         </v-alert>
       </v-col>
-      <!-- <pre>{{activities}}</pre> -->
     </v-row>
     <v-row>
       <v-col v-if='loadingBoard || loadingLists' class="col-8">
@@ -47,122 +46,56 @@
             </v-col>
           </v-row>
           <v-card-actions>
-            <!-- Custom component -->
             <create-card
               :user="user.user"
               :createActivity="createActivity"
               :listId="list.id"
               :boardId="$route.params.id"
             ></create-card>
-            <!-- Custom component -->
           </v-card-actions>
         </v-card>
       </v-col>
       <v-col class="col-4 bg-blue">
         <v-row class="mr-1">
-          <v-card elevation="3" class="ma-2 create-col">
-            <v-card-title>Create List</v-card-title>
-              <v-card-actions>
-                <v-card-text>
-                  <v-form v-model="validList" @submit.prevent="createList" @keydown.prevent.enter
-                    v-if="!creatingList"
-                  >
-                    <v-text-field
-                      v-model="list.name"
-                      :rules="notEmptyRules"
-                      label="Name"
-                      required
-                    ></v-text-field>
-                    <v-btn type="submit" :disabled="!validList" color="primary">Create List</v-btn>
-                  </v-form>
-                  <v-progress-circular
-                    v-if='creatingList'
-                    :width="7" :size="50"
-                    color="primary"
-                    indeterminate
-                  ></v-progress-circular>
-                </v-card-text>
-              </v-card-actions>
-          </v-card>
-          <v-card height="100vh" title elevation="3" class="ml-2 activity-row">
-            <v-list three-line dense>
-              <v-subheader>ACTIVITY LOG</v-subheader>
-                <v-list-item class="pl-1" v-for="(activity,i) in activitiesByDate" :key="i">
-                  <v-list-item-icon class="mr-1">
-                    <v-icon color="green">mdi-account-circle</v-icon>
-                  </v-list-item-icon>
-                  <v-list-item-content>
-                    <v-list-item-title v-html="user.user.displayName"></v-list-item-title>
-                    <v-list-item-subtitle v-if="activitiesByDate"
-                      v-html="markdownify(activity.text)"
-                    ></v-list-item-subtitle>
-                  </v-list-item-content>
-                </v-list-item>
-            </v-list>
-                <!--
-                <v-list-item-subtitle
-                  v-for="activity in activities" :key="activity.id"
-                >{{activity.text}}</v-list-item-subtitle>
-                <v-list-item-action>
-                  <v-icon color="green">mdi-account-circle</v-icon>
-                </v-list-item-action>
-                -->
-          </v-card>
+          <new-list-form
+            :creatingList="creatingList"
+            :createList="createList"
+          ></new-list-form>
+          <Activities
+            :activitiesByDate="activitiesByDate"
+            :user="user"
+          ></Activities>
         </v-row>
       </v-col>
     </v-row>
   </v-container>
 </template>
 
-<style scoped>
-.create-col{
-  min-width: 200px;
-}
-.activity-row{
-  min-width: 100%;
-}
-.bg-blue{
-  background-color: lightblue;
-}
-.bg-yellow{
-  background-color: lightyellow;
-}
-.bg-green{
-  background-color: lightgreen;
-}
-</style>
-
 <script>
-import marked from 'marked';
 import {
   mapActions, mapState, mapGetters, mapMutations,
 } from 'vuex';
 
 import CreateCard from './CreateCard.vue';
+import Activities from '../components/Activities.vue';
+
+import NewListForm from '../components/NewListForm.vue';
 
 export default {
-  components: { CreateCard },
+  components: { CreateCard, Activities, NewListForm },
   name: 'board',
   data: () => ({
     droppingList: null,
     draggingCard: null,
-    validList: false,
     board: {},
-    list: {
-      name: '',
-      order: 0,
-      archived: false,
-    },
-    notEmptyRules: [(value) => !!value || 'Cannot be empty'],
   }),
   mounted() {
-    this.clearActivities(); // Clear the acitivy state on the component reload
-    this.clearLists(); // Clear the lists state on component reload/page refresh
-    this.getBoard(this.$route.params.id) // id of the current page were on, i.e. boards/2
+    this.clearActivities(); // Clear the acitivy state on page load
+    this.clearLists(); // Clear the lists state on component on page load
+    this.getBoard(this.$route.params.id)
       .then((response) => {
         this.board = response.data || response;
-      });
-    this.list.boardId = this.$route.params.id;
+      }); // id of the current page were on, i.e. boards/2
     this.findLists({
       query: {
         boardId: this.$route.params.id,
@@ -186,32 +119,22 @@ export default {
     ...mapActions('lists', { findLists: 'find' }),
     ...mapActions('cards', { findCards: 'find' }),
     ...mapActions('activities', { findActivities: 'find' }),
-    async createList() {
-      if (this.validList) {
-        const list = new this.$FeathersVuex.api.List(this.list);
-        list.boardId = this.$route.params.id;
-        await list.save();
-        this.list = { // overwrite fields
-          name: '',
-          order: 0,
-          archived: false,
-        };
-        this.createActivity(`**${this.user.user.username}** created list **${list.name}**`);
-      }
+    async createList(list) {
+      const newList = new this.$FeathersVuex.api.List(list);
+      // list.boardId = this.$route.params.id;
+      await newList.save();
+      this.createActivity(`**${this.user.user.username}** created list **${newList.name}**`);
     },
-    createActivity(text) {
+    async createActivity(text) {
       const activity = new this.$FeathersVuex.api.Activity();
-      // console.log('DEBUG: activity: ', activity);
       activity.text = text;
       activity.boardId = this.$route.params.id;
-      activity.save();
+      await activity.save();
     },
     startDraggingCard(card) {
-      // console.log('starting dragging...', card);
       this.draggingCard = card;
     },
     setDroppingList(event, list) {
-      // console.log(event);
       // Note you can pass in the raw event dom object in vue by using $event
       this.droppingList = list;
       event.preventDefault();
@@ -233,9 +156,6 @@ export default {
       }
       this.droppingList = null;
       this.draggingCard = null;
-    },
-    markdownify(text) {
-      return marked(text);
     },
   },
   computed: {
@@ -294,3 +214,21 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.create-col{
+  min-width: 200px;
+}
+.activity-row{
+  min-width: 100%;
+}
+.bg-blue{
+  background-color: lightblue;
+}
+.bg-yellow{
+  background-color: lightyellow;
+}
+.bg-green{
+  background-color: lightgreen;
+}
+</style>

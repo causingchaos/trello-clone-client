@@ -5,7 +5,7 @@
         <v-card class="card pa-10"
           elevation="8"
         >
-          <v-form v-model="valid" @submit.prevent="login" @keydown.prevent.enter
+          <v-form v-model="valid" @submit.prevent="login({ valid, user })" @keydown.prevent.enter
           v-if="!loading"
           >
             <h3>Welcome Back!</h3>
@@ -71,40 +71,41 @@ export default {
     // notEmptyRules: [(value) => !!value || 'Cannot be empty'],
   }),
   mounted() {
-    this.$store.dispatch('login/login');
+    // this.$store.dispatch('login/login');
   },
   computed: {
     ...mapState('auth', { loading: 'isAuthenticatePending' }),
   },
   methods: {
     ...mapActions('login', ['login']), // custom module/action
-    ...mapActions('auth', ['authenticate']),
+    // ...mapActions('auth', ['authenticate']),
     ...mapActions('auth', ['reAuthenticate']),
-    login() {
+    /**
+    async login() {
       if (this.valid) {
         this.$store.dispatch('auth/authenticate', {
           strategy: 'local',
           username: this.user.username,
           password: this.user.password,
-        }).then(() => {
+        }).then(async (result) => {
+          console.log(result);
           console.log('pushing user to boards');
           this.$router.push('/boards');
         }).catch((error) => {
           console.log('Authentication error', error);
         });
-        /*
-        this.authenticate({
-          strategy: 'local',
-          username: this.user.username,
-          password: this.user.password,
-        }).then((response) => {
-          // eslint-disable-next-line no-console
-          console.log(response);
-          console.log('logged in!!');
-        });
-        */
+        // this.authenticate({
+        //  strategy: 'local',
+        //  username: this.user.username,
+        //   password: this.user.password,
+        // }).then((response) => {
+        // eslint-disable-next-line no-console
+        //  console.log(response);
+        //  console.log('logged in!!');
+        // });
       }
     },
+    */
   },
 };
 </script>
