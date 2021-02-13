@@ -11,7 +11,9 @@ import listServicePlugin from './services/lists';
 import cardServicePlugin from './services/cards';
 import activityServicePlugin from './services/activities';
 
+// eslint-disable-next-line import/no-cycle
 import login from './login';
+import boardStore from './boardStore';
 
 /*
 const {
@@ -27,6 +29,7 @@ export default new Vuex.Store({
   // Custom modules we defined, i.e. login.js
   modules: {
     login,
+    boardStore,
   },
   plugins: [
     userServicePlugin,

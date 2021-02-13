@@ -25,7 +25,7 @@
       <v-col class="col-8 d-flex flex-wrap bg-yellow" v-if='!loadingBoard && !loadingLists'>
         <v-card  class="ma-1" width="250"
           v-for="list in lists" :key="list.id"
-          @dragover="setDroppingList($event, list)"
+          @dragover="onSetDroppingList($event, list)"
           :class="{ 'green lighten-4': droppingList == list}"
         >
           <v-row no-gutters class="d-flex flex-column">
@@ -85,8 +85,8 @@ export default {
   components: { CreateCard, Activities, NewListForm },
   name: 'board',
   data: () => ({
-    droppingList: null,
-    draggingCard: null,
+    // droppingList: null,
+    // draggingCard: null,
     board: {},
   }),
   mounted() {
@@ -113,6 +113,7 @@ export default {
     });
   },
   methods: {
+    ...mapMutations('boardStore', ['setDroppingList', 'setDraggingCard']),
     ...mapMutations('lists', { clearLists: 'clearAll' }),
     ...mapMutations('activities', { clearActivities: 'clearAll' }),
     ...mapActions('boards', { getBoard: 'get' }),
@@ -132,11 +133,11 @@ export default {
       await activity.save();
     },
     startDraggingCard(card) {
-      this.draggingCard = card;
+      this.setDraggingCard(card);
     },
-    setDroppingList(event, list) {
+    onSetDroppingList(event, list) {
       // Note you can pass in the raw event dom object in vue by using $event
-      this.droppingList = list;
+      this.setDroppingList(list);
       event.preventDefault();
     },
     async dropCard() {
@@ -154,11 +155,12 @@ export default {
           );
         }
       }
-      this.droppingList = null;
-      this.draggingCard = null;
+      this.setDroppingList(null);
+      this.setDraggingCard(null);
     },
   },
   computed: {
+    ...mapState('boardStore', ['droppingList', 'draggingCard']),
     ...mapState('boards', {
       loadingBoard: 'isGetPending',
       boardsError: 'errorOnGet',

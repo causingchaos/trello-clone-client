@@ -2,7 +2,7 @@
   <v-card height="100vh" title elevation="3" class="ml-2 activity-row">
     <v-list three-line dense>
       <v-subheader>ACTIVITY LOG</v-subheader>
-        <v-list-item class="pl-1" v-for="(activity,i) in activitiesByDate" :key="i">
+        <v-list-item class="pl-1" v-for="(activity,i) in activitiesByDate" :key="i" @click="">
           <v-list-item-icon class="mr-1">
             <v-icon color="green">mdi-account-circle</v-icon>
           </v-list-item-icon>
