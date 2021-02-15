@@ -47,7 +47,7 @@
           </v-row>
           <v-card-actions>
             <create-card
-              :user="user.user"
+              :user="user ? user.user : {}"
               :createActivity="createActivity"
               :listId="list.id"
               :boardId="$route.params.id"
