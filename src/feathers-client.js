@@ -5,7 +5,12 @@ import socketio from '@feathersjs/socketio-client';
 import io from 'socket.io-client';
 import { iff, discard } from 'feathers-hooks-common';
 
-const socket = io('http://localhost:3030', { transports: ['websocket'] });
+let API_URL = 'determined-allen-b516da.netlify.app';
+if (window.location.hostname === 'localhost') {
+  API_URL = 'http://localhost:3030';
+}
+
+const socket = io(API_URL, { transports: ['websocket'] });
 
 const feathersClient = feathers()
   .configure(socketio(socket))

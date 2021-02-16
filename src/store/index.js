@@ -11,6 +11,7 @@ import listServicePlugin from './services/lists';
 import cardServicePlugin from './services/cards';
 import activityServicePlugin from './services/activities';
 
+// Custom vuex modules
 import login from './login';
 
 /*
