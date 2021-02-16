@@ -54,7 +54,11 @@
       "parser": "babel-eslint"
     },
     "rules": {
-      "linebreak-style": 0
+      "linebreak-style": 0,
+      "import/prefer-default-export": 0,
+      "no-shadow": 0,
+      "no-return-assign": 0,
+      "vue/valid-v-on": 0
     }
   },
   "browserslist": [

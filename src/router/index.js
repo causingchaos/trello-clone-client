@@ -6,6 +6,7 @@ import Login from '../views/Login.vue';
 import Boards from '../views/Boards.vue';
 import Board from '../views/Board.vue';
 import Playground from '../views/Playground.vue';
+// eslint-disable-next-line import/no-cycle
 import store from '../store/index';
 
 Vue.use(VueRouter);
