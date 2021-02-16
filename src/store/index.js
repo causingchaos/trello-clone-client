@@ -12,6 +12,7 @@ import cardServicePlugin from './services/cards';
 import activityServicePlugin from './services/activities';
 
 // Custom vuex modules
+// eslint-disable-next-line import/no-cycle
 import login from './login';
 import boardStore from './boardStore';
 
