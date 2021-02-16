@@ -5,7 +5,7 @@ import socketio from '@feathersjs/socketio-client';
 import io from 'socket.io-client';
 import { iff, discard } from 'feathers-hooks-common';
 
-let API_URL = 'determined-allen-b516da.netlify.app';
+let API_URL = 'https://trello-clone-4.herokuapp.com';
 if (window.location.hostname === 'localhost') {
   API_URL = 'http://localhost:3030';
 }
